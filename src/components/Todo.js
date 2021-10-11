@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Accordion } from "react-bootstrap";
 
 function Todo() {
@@ -8,25 +8,39 @@ function Todo() {
     const [serchtxt, setserchtxt] = useState({ serching: false, value: "" });
     const [selectItem, setselectItem] = useState({ selected: false, data: {} });
 
+    useEffect(() => {
+        let temp = userlist;
+        temp.sort((a, b) => {
+            return a.id - b.id
+        });
+        setuserlist(temp);
+        console.log(temp)
+    }, [userlist])
+
     function addToList(e) {
+        let newdata = {
+            title: e.target.inTitle.value,
+            detail: e.target.inDetail.value
+        }
+
         if (selectItem.selected) {
             let temp = userlist
             temp = temp.filter(item => item.id !== selectItem.data.id)
             setuserlist([...temp,
             {
-                id: selectItem.id,
-                title: e.target[0].value,
-                detail: e.target[1].value
+                ...newdata,
+                id: selectItem.data.id
+
             }]);
             setselectItem({ selected: false, data: {} })
         } else {
             setuserlist([...userlist,
             {
-                id: userlist.length++,
-                title: e.target[0].value,
-                detail: e.target[1].value
+                ...newdata,
+                id: userlist.length++
             }]);
         }
+
         document.getElementById("todofrm").reset();
         e.preventDefault();
     }
@@ -84,7 +98,7 @@ function Todo() {
                 </>
                 :
                 <div className="text-center">
-                    <h3>{serchtxt ? "No Result Found" : "No Work to Do..!" }</h3>
+                    <h3>{serchtxt.serching ? "No Result Found" : "No Work to Do..!"}</h3>
                 </div>
 
         )
@@ -96,8 +110,8 @@ function Todo() {
             <div className="row">
                 <div className="col-md-4">
                     <form onSubmit={addToList} id="todofrm">
-                        <input type="text" placeholder="Enter todo" id="itemTitle" className="form-control my-1" required />
-                        <textarea className="form-control my-1" id="itemDetail" placeholder="Enter Detail" />
+                        <input type="text" placeholder="Enter todo" id="itemTitle" name="inTitle" className="form-control my-1" required />
+                        <textarea className="form-control my-1" id="itemDetail" name="inDetail" placeholder="Enter Detail" />
                         <button type="submit" className="submitbtn btn btn-primary rounded-0">
                             {selectItem.selected ? "Update" : "Add"}</button>
                         <button type="reset" className="btn rounded-0 ms-2" onClick={() => setselectItem({ selected: false, data: {} })}>CANCLE</button>
