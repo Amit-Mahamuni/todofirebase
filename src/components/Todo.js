@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
-import { Accordion, Badge, Dropdown } from "react-bootstrap";
-
+import { Accordion, Badge, Dropdown, Modal } from "react-bootstrap";
+import add from "../assets/images/add.png";
+import filtericon from "../assets/images/filter.png";
+// const logo = require("../../public/images")
 function Todo() {
 
     const [mainlist, setmainlist] = useState([]);
@@ -8,6 +10,7 @@ function Todo() {
     const [serchtxt, setserchtxt] = useState({ serching: false, value: "" });
     const [selectItem, setselectItem] = useState({ selected: false, data: {} });
     const [filterstate, setfilterstate] = useState({ filtering: false, data: {} });
+    const [showModel, setshowModel] = useState(true);
 
     const test = {
         status: ["Select Priority", "Progress", "Medium", "Done"],
@@ -52,17 +55,24 @@ function Todo() {
         }
 
         document.getElementById("todofrm").reset();
+        setshowModel(false)
         e.preventDefault();
     }
 
     function updateItem(i) {
+        setshowModel(true);
         let temp = mainlist.filter(item => item.id === i)[0];
-        document.getElementById("itemTitle").value = temp.title;
-        document.getElementById("itemDetail").value = temp.detail;
-        document.getElementById("inPriority").value = temp.priority;
-        document.getElementById("instatus").value = temp.status;
         setselectItem({ selected: true, data: temp });
-        console.log(selectItem)
+        console.log(selectItem);
+    }
+
+    function setfrmVal() {
+        if (selectItem.selected) {
+            document.getElementById("itemTitle").value = selectItem.data.title;
+            document.getElementById("itemDetail").value = selectItem.data.detail;
+            document.getElementById("inPriority").value = selectItem.data.priority;
+            document.getElementById("instatus").value = selectItem.data.status;
+        }
     }
 
     function removeItem(i) {
@@ -186,27 +196,7 @@ function Todo() {
         <>
             <div className="container bg-white p-3 my-md-3 mianContainer">
                 <div className="row">
-                    <div className="col-md-4">
-                        <form onSubmit={addToList} id="todofrm">
-                            <div class="d-flex">
-                                <select class="form-select form-control w-50 me-1" id="inPriority" name="inPriority">
-                                    <option value="1" selected >Low</option>
-                                    <option value="2">Medium</option>
-                                    <option value="3">High</option>
-                                </select>
-                                <select class="form-select form-control w-50" id="instatus" name="instatus" hidden={selectItem.selected ? false : true} >
-                                    <option value="1" selected>Progress</option>
-                                    <option value="2">Done</option>
-                                </select>
-                            </div>
-                            <input type="text" placeholder="Enter todo" id="itemTitle" name="inTitle" className="form-control my-1" required />
-                            <textarea className="form-control my-1" id="itemDetail" name="inDetail" placeholder="Enter Detail" />
-                            <button type="submit" className="submitbtn btn btn-primary rounded-0">
-                                {selectItem.selected ? "Update" : "Add"}</button>
-                            <button type="reset" className="btn rounded-0 ms-2" onClick={() => setselectItem({ selected: false, data: {} })}>CANCLE</button>
-                        </form>
-                    </div>
-                    <div className="col-md-8 mt-md-0 mt-2">
+                    <div className="col-md-12 mt-md-0 mt-2">
                         {serchlist.length || mainlist.length ?
                             <>
                                 <div className="row">
@@ -216,8 +206,8 @@ function Todo() {
                                         {/* <button className="submitbtn ms-2 btn btn-dark rounded-0"
                                             onClick={() => setshowModel(true)}>Filter</button> */}
                                         <Dropdown>
-                                            <Dropdown.Toggle className="submitbtn ms-2 btn btn-dark rounded-0" id="dropdown-basic">
-                                                Filter
+                                            <Dropdown.Toggle className="filterbtn ms-2 btn btn-light rounded-0" id="dropdown-basic">
+                                                <img src={filtericon} height="20px" width="20x" alt="filter icon" />
                                             </Dropdown.Toggle>
 
                                             <Dropdown.Menu className="p-3 shadow rounded-0">
@@ -226,15 +216,15 @@ function Todo() {
                                                         <input type="date" name="strdate" className="form-control w-50 me-2" placeholder="Date Start" />
                                                         <input type="date" name="enddate" className="form-control w-50" placeholder="Date Start" />
                                                     </div>
-                                                    <div class="d-flex my-2">
-                                                        <select class="form-select form-control w-50 me-2" id="filtpriority" name="filtpriority">
-                                                            <option value="0" selected>Select Priority</option>
+                                                    <div className="d-flex my-2">
+                                                        <select className="form-select form-control w-50 me-2" id="filtpriority" name="filtpriority">
+                                                            <option value="0" >Select Priority</option>
                                                             <option value="1" >Low</option>
                                                             <option value="2">Medium</option>
                                                             <option value="3">High</option>
                                                         </select>
-                                                        <select class="form-select form-control w-50" id="filtstatus" name="filtstatus">
-                                                            <option value="0" selected>Select Status</option>
+                                                        <select className="form-select form-control w-50" id="filtstatus" name="filtstatus">
+                                                            <option value="0" >Select Status</option>
                                                             <option value="1" >Progress</option>
                                                             <option value="2">Done</option>
                                                         </select>
@@ -253,6 +243,34 @@ function Todo() {
                         <DisplayList list={serchtxt.serching ? serchlist : mainlist} />
                     </div>
                 </div>
+                <button className="addflotbtn shadow btn btn-light rounded-circle border-dark border-2 p-0"
+                    onClick={() => setshowModel(true)}><img src={add} alt="add icon" /></button>
+                <Modal show={showModel} onHide={() => { setselectItem({ selected: false, data: {} }); setshowModel(false) }}
+                    onShow={() => setfrmVal()} centered>
+                    <Modal.Header closeButton>
+                        <Modal.Title> {selectItem.selected ? "Update" : "Add"} Task</Modal.Title>
+                    </Modal.Header>
+                    <Modal.Body>
+                        <form onSubmit={addToList} id="todofrm">
+                            <div className="d-flex">
+                                <select className="form-select form-control w-50 me-1" id="inPriority" name="inPriority">
+                                    <option value="1"  >Low</option>
+                                    <option value="2">Medium</option>
+                                    <option value="3">High</option>
+                                </select>
+                                <select className="form-select form-control w-50" id="instatus" name="instatus" hidden={selectItem.selected ? false : true} >
+                                    <option value="1" >Progress</option>
+                                    <option value="2">Done</option>
+                                </select>
+                            </div>
+                            <input type="text" placeholder="Enter Title" id="itemTitle" name="inTitle" className="form-control my-1" required />
+                            <textarea className="form-control my-1" id="itemDetail" name="inDetail" placeholder="Enter Detail" />
+                            <button type="submit" className="submitbtn btn btn-primary rounded-0">
+                                {selectItem.selected ? "Update" : "Add"}</button>
+                            <button type="reset" className="btn rounded-0 ms-2" onClick={() => setselectItem({ selected: false, data: {} })}>CANCLE</button>
+                        </form>
+                    </Modal.Body>
+                </Modal>
             </div >
         </>
     )
