@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Accordion, Badge, Dropdown, Modal } from "react-bootstrap";
 import add from "../assets/images/add.png";
 import filtericon from "../assets/images/filter.png";
-// const logo = require("../../public/images")
+
 function Todo() {
 
     const [mainlist, setmainlist] = useState([]);
@@ -13,7 +13,7 @@ function Todo() {
     const [showModel, setshowModel] = useState(true);
 
     const test = {
-        status: ["Select Priority", "Progress", "Medium", "Done"],
+        status: ["Select Priority", "Progress", "Done"],
         priority: ["Select Status", "Low", "Medium", "High"]
     }
 
@@ -33,7 +33,7 @@ function Todo() {
             status: parseInt(e.target.instatus.value),
             priority: parseInt(e.target.inPriority.value),
             create_date: selectItem.selected ? selectItem.data.create_date : new Date().toISOString(),
-            done_date: e.target.instatus.value === 1 ? new Date().toISOString() : null,
+            done_date: parseInt(e.target.instatus.value) === 2 ? new Date().toISOString() : null,
         }
 
         if (selectItem.selected) {
@@ -106,6 +106,35 @@ function Todo() {
         e.preventDefault();
     }
 
+
+    function convertDate(pass_date) {
+        pass_date = new Date(pass_date)
+        var curr_date = new Date()
+
+        if ((curr_date.getDate() - pass_date.getDate()) !== 0) {
+            return (curr_date.getDate() - pass_date.getDate() + " Day Ago")
+        } else {
+            if ((curr_date.getHours() - pass_date.getHours()) !== 0) {
+                return (curr_date.getHours() - pass_date.getHours()
+                    + " Hour Ago")
+            } else {
+
+                if ((
+                    curr_date.getMinutes()
+                    - pass_date.getMinutes()
+                ) !== 0) {
+                    return (
+                        curr_date.getMinutes()
+                        - pass_date.getMinutes()
+                        + " Min Ago")
+                } else {
+                    return ("Just Now")
+                }
+
+            }
+        }
+    }
+
     function DisplayList(props) {
         var temp = props.list;
         temp.sort((a, b) => {
@@ -156,6 +185,16 @@ function Todo() {
                                             <div className="d-flex justify-content-between w-100 me-2">
                                                 <span>{item.title}</span>
                                                 <span>
+                                                    {item.status === 2 ?
+                                                        <span className="me-2" style={{ "fontSize": "14px" }}>
+                                                            <span style={{ "fontSize": "10px" }}>Completed </span>
+                                                            <br />{convertDate(item.done_date)}
+                                                        </span>
+                                                        : <span className="me-2" style={{ "fontSize": "14px" }}>
+                                                            <span style={{ "fontSize": "10px" }}>Added </span>
+                                                            <br />{convertDate(item.create_date)}
+                                                        </span>
+                                                    }
                                                     <Badge pill bg={item.status === 1 ? "info" : "success"} className="me-2">
                                                         {item.status === 1 ? "Progress" : "Done"}
                                                     </Badge>
