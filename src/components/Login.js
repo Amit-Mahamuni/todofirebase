@@ -19,16 +19,16 @@ function Login(props) {
             <Card style={{ width: '30rem', height: "max-content" }}>
                 <Card.Body>
                     <form onSubmit={login_frm_submit}>
-                        <div class="mb-3">
-                            <label for="login_mail" class="form-label">Email address</label>
-                            <input type="email" class="form-control" name="login_mail" id="login_mail" aria-describedby="emailHelp" />
-                            <div id="emailHelp" class="form-text">We'll never share your email with anyone else.</div>
+                        <div className="mb-3">
+                            <label for="login_mail" className="form-label">Email address</label>
+                            <input type="email" className="form-control" name="login_mail" id="login_mail" aria-describedby="emailHelp" />
+                            <div id="emailHelp" className="form-text">We'll never share your email with anyone else.</div>
                         </div>
-                        <div class="mb-3">
-                            <label for="login_passwd" class="form-label">Password</label>
-                            <input type="password" class="form-control" name="login_passwd" id="login_passwd" />
+                        <div className="mb-3">
+                            <label for="login_passwd" className="form-label">Password</label>
+                            <input type="password" className="form-control" name="login_passwd" id="login_passwd" />
                         </div>
-                        <button type="submit" class="submitbtn rounded-0 btn btn-dark">Submit</button>
+                        <button type="submit" className="submitbtn rounded-0 btn btn-dark">Submit</button>
                     </form>
                 </Card.Body>
             </Card>

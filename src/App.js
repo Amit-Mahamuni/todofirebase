@@ -10,7 +10,7 @@ function App() {
     localStorage.setItem("user", JSON.stringify(user))
   }, [user]);
 
-  function user_logout(){
+  function user_logout() {
     setuser({});
   }
 
@@ -39,10 +39,11 @@ function App() {
           </Navbar.Collapse>
         </Container>
       </Navbar>
-      {
-        user && Object.keys(user).length !== 0 ? <Todo /> :
+      <Todo /> 
+      {/* {
+        user && Object.keys(user).length === 0 ? <Todo /> :
           <Login setusr={setuser} />
-      }
+      } */}
     </div>
   );
 }

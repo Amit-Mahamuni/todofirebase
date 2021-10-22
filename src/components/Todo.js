@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Accordion, Badge, Dropdown, Modal } from "react-bootstrap";
 import add from "../assets/images/add.png";
 import filtericon from "../assets/images/filter.png";
+import axios from "axios";
 
 function Todo() {
 
@@ -17,14 +18,19 @@ function Todo() {
         priority: ["Select Status", "Low", "Medium", "High"]
     }
 
+    function getData() {
+        axios({
+            method: "get",
+            url: "http://localhost:3001/"
+        }).then((response) => {
+            console.log(response.data)
+            setmainlist(response.data.data)
+        })
+    }
+
     useEffect(() => {
-        let temp = mainlist;
-        temp.sort((a, b) => {
-            return a.id - b.id
-        });
-        setmainlist(temp);
-        console.log(temp)
-    }, [mainlist])
+        getData()
+    }, [])
 
     function addToList(e) {
         let newdata = {
@@ -35,23 +41,16 @@ function Todo() {
             create_date: selectItem.selected ? selectItem.data.create_date : new Date().toISOString(),
             done_date: parseInt(e.target.instatus.value) === 2 ? new Date().toISOString() : null,
         }
-
+        console.log(newdata)
         if (selectItem.selected) {
-            let temp = mainlist
-            temp = temp.filter(item => item.id !== selectItem.data.id)
-            setmainlist([...temp,
-            {
-                ...newdata,
-                id: selectItem.data.id
-
-            }]);
-            setselectItem({ selected: false, data: {} })
+            setselectItem({ selected: false, data: {} });
+            axios.post("http://localhost:3001/update/" + selectItem.data.id, newdata).then((response) => {
+                getData()
+            })
         } else {
-            setmainlist([...mainlist,
-            {
-                ...newdata,
-                id: mainlist.length ? mainlist.length + 1 : 1
-            }]);
+            axios.post("http://localhost:3001/", newdata).then((response) => {
+                getData()
+            })
         }
 
         document.getElementById("todofrm").reset();
@@ -76,10 +75,9 @@ function Todo() {
     }
 
     function removeItem(i) {
-        let temp = mainlist
-        temp = temp.filter(item => item.id !== i)
-        console.log(temp)
-        setmainlist(temp)
+        axios.delete("http://localhost:3001/" + i).then((response) => {
+            getData();
+        })
     }
 
     function searchList(sertxt) {
@@ -107,8 +105,10 @@ function Todo() {
     }
 
     function convertDate(pass_date) {
+        console.log(pass_date)
         pass_date = new Date(pass_date)
         var curr_date = new Date()
+        
 
         if ((curr_date.getDate() - pass_date.getDate()) !== 0) {
             return (curr_date.getDate() - pass_date.getDate() + " Day Ago")
@@ -132,6 +132,29 @@ function Todo() {
 
             }
         }
+
+        // if ((curr_date.getDate() - pass_date.getDate()) !== 0) {
+        //     return (curr_date.getDate() - pass_date.getDate() + " Day Ago")
+        // } else {
+        //     if ((curr_date.getHours() - pass_date.getHours()) !== 0) {
+        //         return (curr_date.getHours() - pass_date.getHours()
+        //             + " Hour Ago")
+        //     } else {
+
+        //         if ((
+        //             curr_date.getMinutes()
+        //             - pass_date.getMinutes()
+        //         ) !== 0) {
+        //             return (
+        //                 curr_date.getMinutes()
+        //                 - pass_date.getMinutes()
+        //                 + " Min Ago")
+        //         } else {
+        //             return ("Just Now")
+        //         }
+
+        //     }
+        // }
     }
 
     function DisplayList(props) {
