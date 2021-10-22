@@ -4,7 +4,7 @@ import add from "../assets/images/add.png";
 import filtericon from "../assets/images/filter.png";
 import axios from "axios";
 
-function Todo() {
+function Todo(props) {
 
     const [mainlist, setmainlist] = useState([]);
     const [serchlist, setserchlist] = useState([]);
@@ -13,24 +13,31 @@ function Todo() {
     const [filterstate, setfilterstate] = useState({ filtering: false, data: {} });
     const [showModel, setshowModel] = useState(true);
 
+    const configHeader = {
+        headers: {
+            accesstoken: props.token
+        }
+    }
+
     const test = {
         status: ["Select Priority", "Progress", "Done"],
         priority: ["Select Status", "Low", "Medium", "High"]
     }
 
     function getData() {
-        axios({
-            method: "get",
-            url: "http://localhost:3001/"
-        }).then((response) => {
+        axios.get("http://localhost:3001/", configHeader).then((response) => {
             console.log(response.data)
             setmainlist(response.data.data)
         })
     }
 
     useEffect(() => {
-        getData()
-    }, [])
+        if (window.navigator.onLine) {
+            getData();
+        }else{
+            alert("No Internet Connection")
+        }
+    },[])
 
     function addToList(e) {
         let newdata = {
@@ -39,16 +46,16 @@ function Todo() {
             status: parseInt(e.target.instatus.value),
             priority: parseInt(e.target.inPriority.value),
             create_date: selectItem.selected ? selectItem.data.create_date : new Date().toISOString(),
-            done_date: parseInt(e.target.instatus.value) === 2 ? new Date().toISOString() : null,
+            done_date: parseInt(e.target.instatus.value) === 2 ? new Date().toISOString() : null
         }
         console.log(newdata)
         if (selectItem.selected) {
             setselectItem({ selected: false, data: {} });
-            axios.post("http://localhost:3001/update/" + selectItem.data.id, newdata).then((response) => {
+            axios.post("http://localhost:3001/update/" + selectItem.data.id, newdata, configHeader).then((response) => {
                 getData()
             })
         } else {
-            axios.post("http://localhost:3001/", newdata).then((response) => {
+            axios.post("http://localhost:3001/", newdata, configHeader).then((response) => {
                 getData()
             })
         }
@@ -75,7 +82,7 @@ function Todo() {
     }
 
     function removeItem(i) {
-        axios.delete("http://localhost:3001/" + i).then((response) => {
+        axios.delete("http://localhost:3001/" + i, configHeader).then((response) => {
             getData();
         })
     }
@@ -105,10 +112,8 @@ function Todo() {
     }
 
     function convertDate(pass_date) {
-        console.log(pass_date)
         pass_date = new Date(pass_date)
         var curr_date = new Date()
-        
 
         if ((curr_date.getDate() - pass_date.getDate()) !== 0) {
             return (curr_date.getDate() - pass_date.getDate() + " Day Ago")
@@ -132,29 +137,6 @@ function Todo() {
 
             }
         }
-
-        // if ((curr_date.getDate() - pass_date.getDate()) !== 0) {
-        //     return (curr_date.getDate() - pass_date.getDate() + " Day Ago")
-        // } else {
-        //     if ((curr_date.getHours() - pass_date.getHours()) !== 0) {
-        //         return (curr_date.getHours() - pass_date.getHours()
-        //             + " Hour Ago")
-        //     } else {
-
-        //         if ((
-        //             curr_date.getMinutes()
-        //             - pass_date.getMinutes()
-        //         ) !== 0) {
-        //             return (
-        //                 curr_date.getMinutes()
-        //                 - pass_date.getMinutes()
-        //                 + " Min Ago")
-        //         } else {
-        //             return ("Just Now")
-        //         }
-
-        //     }
-        // }
     }
 
     function DisplayList(props) {

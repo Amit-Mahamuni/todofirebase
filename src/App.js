@@ -6,12 +6,16 @@ import { Navbar, Container, Dropdown } from "react-bootstrap";
 function App() {
 
   const [user, setuser] = useState();
+
   useEffect(() => {
-    localStorage.setItem("user", JSON.stringify(user))
-  }, [user]);
+    if (localStorage.getItem("user")) {
+      setuser(JSON.parse(localStorage.getItem("user")))
+    }
+  }, []);
 
   function user_logout() {
-    setuser({});
+    localStorage.clear();
+    setuser(undefined);
   }
 
   return (
@@ -26,24 +30,23 @@ function App() {
                 user && Object.keys(user).length !== 0 ?
                   <Dropdown>
                     <Dropdown.Toggle className="btn btn-light py-0 rounded-0" id="dropdown-login">
-                      {user.mail.split("@")[0]}
+                      {user.data.name}
                     </Dropdown.Toggle>
                     <Dropdown.Menu className="shadow rounded-0">
                       <Dropdown.Item eventKey="1" onClick={user_logout}>Log Out</Dropdown.Item>
                     </Dropdown.Menu>
                   </Dropdown>
                   :
-                  "Login"
+                  null
               }
             </Navbar.Text>
           </Navbar.Collapse>
         </Container>
       </Navbar>
-      <Todo /> 
-      {/* {
-        user && Object.keys(user).length === 0 ? <Todo /> :
+      {
+        user ? <Todo token={user.accessToken}/> :
           <Login setusr={setuser} />
-      } */}
+      }
     </div>
   );
 }
